@@ -50,8 +50,8 @@ public class UsuarioRepository {
         jdbcTemplate.update(sql,
             Usuario.getNombre(),
             Usuario.getApellido(), 
-            Usuario.getTelefono(),
-            Usuario.getEmail()
+            Usuario.getEmail(),
+            Usuario.getTelefono()
         );
     }
 }
