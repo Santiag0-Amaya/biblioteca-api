@@ -10,13 +10,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.santiago.biblioteca.model.Usuario;
+import com.santiago.biblioteca.service.UsuarioService;
 
 @RestController
 @RequestMapping("/usuarios")
 public class UsuarioController {
     
     @Autowired
-    private UsuarioService UsuarioService;
+    private UsuarioService usuarioService;
 
     public List<Usuario> getUsuarios() {
         return usuarioService.obtenerTodosLosUsuarios();
@@ -28,7 +29,8 @@ public class UsuarioController {
 
     @PostMapping
     public String crearUsuario(@RequestBody Usuario usuario){
-        usuarioService.crearUsuario(usuario);
+        usuarioService.guardar(usuario);
+        return "Creado con exito";
     }
 
     
