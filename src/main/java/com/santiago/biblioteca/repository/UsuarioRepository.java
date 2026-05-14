@@ -18,13 +18,14 @@ public class UsuarioRepository {
     public List<Usuario> findAll() {
         String sql = "SELECT * FROM Usuarios";
         return jdbcTemplate.query(sql, (rs, rowNum) -> {
-            Usuario Usuario = new Usuario();
-            Usuario.setId(rs.getInt("id"));
-            Usuario.setNombre(rs.getString("nombre"));
-            Usuario.setApellido(rs.getString("apellido"));
-            Usuario.setEmail(rs.getString("email"));
-            Usuario.setTelefono(rs.getString("telefono"));
-            return Usuario;
+            Usuario usuario = new Usuario();
+            usuario.setId(rs.getInt("id"));
+            usuario.setDni(rs.getString("dni"));
+            usuario.setNombre(rs.getString("nombre"));
+            usuario.setApellido(rs.getString("apellido"));
+            usuario.setEmail(rs.getString("email"));
+            usuario.setTelefono(rs.getString("telefono"));
+            return usuario;
         });
     }
     
