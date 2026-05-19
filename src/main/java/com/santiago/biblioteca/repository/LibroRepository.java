@@ -62,15 +62,15 @@ public class LibroRepository {
     }
 
     public void update(Libro libro) {
-    String sql = "UPDATE libros SET titulo = ?, autor = ?, isbn = ?, anio_publicacion = ?, stock_total = ?, stock_disponible = ? WHERE id = ?";
-    jdbcTemplate.update(sql,
-        libro.getTitulo(),
-        libro.getAutor(),
-        libro.getIsbn(),
-        libro.getAnioPublicacion(),
-        libro.getStockTotal(),
-        libro.getStockDisponible(),
-        libro.getId()
-    );
-}
+        String sql = "UPDATE libros SET titulo = ?, autor = ?, isbn = ?, anio_publicacion = ?, stock_total = ?, stock_disponible = ? WHERE id = ?";
+        jdbcTemplate.update(sql,
+            libro.getTitulo(),
+            libro.getAutor(),
+            libro.getIsbn(),
+            libro.getAnioPublicacion(),
+            libro.getStockTotal(),
+            libro.getStockDisponible(),
+            libro.getId()
+        );
+    }
 }

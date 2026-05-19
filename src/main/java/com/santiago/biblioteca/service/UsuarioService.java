@@ -14,10 +14,6 @@ public class UsuarioService {
     @Autowired
     private UsuarioRepository usuarioRepository;
     
-    public Usuario registrarUsuario (Usuario usuario) {
-
-
-    }
 
     public List<Usuario> obtenerTodosLosUsuarios(){
         return usuarioRepository.findAll(); 
@@ -31,6 +27,6 @@ public class UsuarioService {
     }
 
     public boolean puedePedirPrestamo(Usuario usuario){
-        return usuario != null && usuario.getEstado() == "VALIDO";
+        return usuario != null && usuario.getEstado().equals("VALIDO");
     }
 }

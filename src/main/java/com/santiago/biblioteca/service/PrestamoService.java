@@ -11,7 +11,6 @@ import com.santiago.biblioteca.model.Prestamo;
 import com.santiago.biblioteca.model.Usuario;
 import com.santiago.biblioteca.repository.LibroRepository;
 import com.santiago.biblioteca.repository.PrestamoRepository;
-import com.santiago.biblioteca.repository.UsuarioRepository;
 
 @Service
 public class PrestamoService {
@@ -49,6 +48,25 @@ public class PrestamoService {
         return prestamo;
 
     }
+
+    public Prestamo registrarDevolucion(int prestamoID){
+        Prestamo prestamo = prestamoRepository.findId(prestamoID);
+        if(prestamo == null) throw new RuntimeException("Prestamo inexistente");
+        if(prestamo.getEstado().equals("DEVUELTO")) throw new RuntimeException("Prestamo devuelto");
+        
+        prestamo.setEstado("DEVUELTO");
+        prestamo.setFechaDevolucionReal(LocalDate.now());
+        prestamoRepository.update(prestamo);
+
+        Libro libro = libroRepository.findId(prestamo.getLibroId());
+        if (libro != null) {
+            libro.setStockDisponible(libro.getStockDisponible()+1);
+            libroRepository.update(libro);
+        }
+
+        return prestamo;
+
+    }
     
     public List<Prestamo> obtenerTodosLosPrestamos() {
         // Aquí puedes agregar lógica antes de devolver
@@ -58,9 +76,6 @@ public class PrestamoService {
 
     public Prestamo obtenerPorId(int id) {
         return prestamoRepository.findId(id);
-    }
-    public void guardar(Prestamo prestamo) {
-        prestamoRepository.save(prestamo);
     }
 
 

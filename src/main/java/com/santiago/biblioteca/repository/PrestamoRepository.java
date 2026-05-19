@@ -7,6 +7,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import com.santiago.biblioteca.model.Libro;
 import com.santiago.biblioteca.model.Prestamo;
 
 
@@ -59,6 +60,15 @@ public class PrestamoRepository {
             prestamo.getFechaDevolucionPrevista(),
             prestamo.getFechaDevolucionReal(),
             prestamo.getEstado()
+        );
+    }
+
+    public void update(Prestamo prestamo) {
+        String sql = "UPDATE prestamos SET fecha_devolucion_real = ?, estado = ? WHERE id = ?";
+        jdbcTemplate.update(sql,
+            prestamo.getFechaDevolucionReal(),
+            prestamo.getEstado(),
+            prestamo.getId()
         );
     }
 }
