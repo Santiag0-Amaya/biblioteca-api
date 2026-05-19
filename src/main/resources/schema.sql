@@ -18,8 +18,8 @@ CREATE TABLE IF NOT EXISTS usuarios (
 
 CREATE TABLE IF NOT EXISTS prestamos (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    usuario_id INTEGER FOREIGN KEY NOT NULL,
-    libro_id INTEGER FOREIGN KEY NOT NULL,
+    usuario_id INTEGER NOT NULL,
+    libro_id INTEGER NOT NULL,
     fecha_prestamo TEXT NOT NULL,
     fecha_devolucion_prevista TEXT NOT NULL,
     fecha_devolucion_real TEXT,

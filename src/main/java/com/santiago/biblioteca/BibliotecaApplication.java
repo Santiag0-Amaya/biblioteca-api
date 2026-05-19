@@ -10,39 +10,40 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import com.santiago.biblioteca.model.Libro;
 import com.santiago.biblioteca.model.Usuario;
+import com.santiago.biblioteca.model.Prestamo;
 import com.santiago.biblioteca.service.LibroService;
 import com.santiago.biblioteca.service.UsuarioService;
+import com.santiago.biblioteca.service.PrestamoService; // Importante inyectarlo
 
 @SpringBootApplication
 public class BibliotecaApplication implements CommandLineRunner { 
 
-	public static void main(String[] args) {
-		SpringApplication.run(BibliotecaApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(BibliotecaApplication.class, args);
+    }
 
-	private Scanner scanner = new Scanner(System.in);
+    private Scanner scanner = new Scanner(System.in);
 
-	@Autowired
+    @Autowired
     private LibroService libroService;
     
     @Autowired
     private UsuarioService usuarioService;
-	
+    
+    @Autowired
+    private PrestamoService prestamoService; // Inyectamos el servicio de préstamos
 
-	@Override
-	public void run(String... args) throws Exception {
-		// El menú va AQUÍ
-		System.out.println("=== BIBLIOTECA INICIADA ===");
-		// podés llamar a un método con el menú
-		menuConsola();
-	}
-	
-	private void menuConsola() {
-		// acá va todo el menú
-		mostrarMenu();
-	}
+    @Override
+    public void run(String... args) throws Exception {
+        System.out.println("=== BIBLIOTECA INICIADA ===");
+        menuConsola();
+    }
+    
+    private void menuConsola() {
+        mostrarMenu();
+    }
 
-	private void mostrarMenu() {
+    private void mostrarMenu() {
         boolean salir = false;
         
         while (!salir) {
@@ -51,7 +52,10 @@ public class BibliotecaApplication implements CommandLineRunner {
             System.out.println("2. Agregar libro");
             System.out.println("3. Listar usuarios");
             System.out.println("4. Agregar usuario");
-            System.out.println("5. Salir");
+            System.out.println("5. Registrar Préstamo");
+            System.out.println("6. Registrar Devolución");
+            System.out.println("7. Listar todos los préstamos");
+            System.out.println("8. Salir");
             System.out.print("Elija una opción: ");
             
             int opcion = scanner.nextInt();
@@ -71,6 +75,15 @@ public class BibliotecaApplication implements CommandLineRunner {
                     agregarUsuario();
                     break;
                 case 5:
+                    solicitarPrestamo();
+                    break;
+                case 6:
+                    devolverLibro();
+                    break;
+                case 7:
+                    listarPrestamos();
+                    break;
+                case 8:
                     salir = true;
                     System.out.println("¡Hasta luego!");
                     break;
@@ -126,16 +139,18 @@ public class BibliotecaApplication implements CommandLineRunner {
         } else {
             System.out.println("\n--- LISTA DE USUARIOS ---");
             for (Usuario usuario : usuarios) {
-                System.out.println(usuario.getId() + " | " + usuario.getNombre() + " | " + usuario.getEmail() + " | " + usuario.getTelefono());
+                System.out.println(usuario.getId() + " | DNI: " + usuario.getDni() + " | " + usuario.getNombre() + " " + usuario.getApellido() + " | Estado: " + usuario.getEstado());
             }
         }
     }
     
     private void agregarUsuario() {
         System.out.println("\n--- AGREGAR USUARIO ---");
+        System.out.print("DNI: ");
+        String dni = scanner.nextLine();
         System.out.print("Nombre: ");
         String nombre = scanner.nextLine();
-		System.out.print("Apellido: ");
+        System.out.print("Apellido: ");
         String apellido = scanner.nextLine();
         System.out.print("Email: ");
         String email = scanner.nextLine();
@@ -143,12 +158,63 @@ public class BibliotecaApplication implements CommandLineRunner {
         String telefono = scanner.nextLine();
         
         Usuario usuario = new Usuario();
+        usuario.setDni(dni);
         usuario.setNombre(nombre);
-		usuario.setApellido(apellido);
+        usuario.setApellido(apellido);
         usuario.setEmail(email);
         usuario.setTelefono(telefono);
+        usuario.setEstado("VALIDO"); // Lo creamos activo por defecto
         
         usuarioService.guardar(usuario);
         System.out.println("✓ Usuario agregado exitosamente");
+    }
+
+    private void solicitarPrestamo() {
+        System.out.println("\n--- REGISTRAR PRÉSTAMO ---");
+        System.out.print("Ingrese el ID del Usuario: ");
+        int usuarioId = scanner.nextInt();
+        System.out.print("Ingrese el ID del Libro: ");
+        int libroId = scanner.nextInt();
+        scanner.nextLine();
+
+        try {
+            // Llama a tu método con toda la lógica de negocio controlada
+            prestamoService.registrarPrestamo(usuarioId, libroId);
+            System.out.println("✓ Préstamo registrado exitosamente.");
+        } catch (RuntimeException e) {
+            // Si el libro no tiene stock o el usuario no existe, frena acá y muestra el por qué
+            System.out.println("❌ Error al registrar préstamo: " + e.getMessage());
+        }
+    }
+
+    private void devolverLibro() {
+        System.out.println("\n--- REGISTRAR DEVOLUCIÓN ---");
+        System.out.print("Ingrese el ID del Préstamo a devolver: ");
+        int prestamoId = scanner.nextInt();
+        scanner.nextLine();
+
+        try {
+            prestamoService.registrarDevolucion(prestamoId);
+            System.out.println("✓ Libro devuelto correctamente. Stock actualizado.");
+        } catch (RuntimeException e) {
+            System.out.println("❌ Error al devolver: " + e.getMessage());
+        }
+    }
+
+    private void listarPrestamos() {
+        List<Prestamo> prestamos = prestamoService.obtenerTodosLosPrestamos();
+        if (prestamos.isEmpty()) {
+            System.out.println("No hay préstamos registrados.");
+        } else {
+            System.out.println("\n--- LISTA DE PRÉSTAMOS ---");
+            for (Prestamo p : prestamos) {
+                System.out.println("ID Prestamo: " + p.getId() + 
+                                   " | Usuario ID: " + p.getUsuarioId() + 
+                                   " | Libro ID: " + p.getLibroId() + 
+                                   " | Estado: " + p.getEstado() + 
+                                   " | F. Prestamo: " + p.getFechaPrestamo() + 
+                                   " | F. Prevista: " + p.getFechaDevolucionPrevista());
+            }
+        }
     }
 }
