@@ -13,7 +13,8 @@ CREATE TABLE IF NOT EXISTS usuarios (
     nombre TEXT NOT NULL,
     apellido TEXT NOT NULL,
     email TEXT UNIQUE NOT NULL,
-    telefono TEXT
+    telefono TEXT,
+    estado TEXT DEFAULT 'VALIDO'
 );
 
 CREATE TABLE IF NOT EXISTS prestamos (

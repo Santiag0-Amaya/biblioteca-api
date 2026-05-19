@@ -1,5 +1,6 @@
 package com.santiago.biblioteca.repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,7 +8,6 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import com.santiago.biblioteca.model.Libro;
 import com.santiago.biblioteca.model.Prestamo;
 
 
@@ -24,9 +24,14 @@ public class PrestamoRepository {
             prestamo.setId(rs.getInt("id"));
             prestamo.setUsuarioId(rs.getInt("usuario_id"));
             prestamo.setLibroId(rs.getInt("libro_id"));
-            prestamo.setFechaPrestamo(rs.getDate("fecha_prestamo").toLocalDate());
-            prestamo.setFechaDevolucionPrevista(rs.getDate("fecha_devolucion_prevista").toLocalDate());
-            prestamo.setFechaDevolucionReal(rs.getDate("fecha_devolucion_real").toLocalDate());
+            prestamo.setFechaPrestamo(LocalDate.parse(rs.getString("fecha_prestamo")));
+            prestamo.setFechaDevolucionPrevista(LocalDate.parse(rs.getString("fecha_devolucion_prevista")));
+            String fechaRealStr = rs.getString("fecha_devolucion_real");
+            if (fechaRealStr != null) {
+                prestamo.setFechaDevolucionReal(LocalDate.parse(fechaRealStr));
+            } else {
+                prestamo.setFechaDevolucionReal(null); // Si es null en la BD, queda null en Java sin romper
+            }
             prestamo.setEstado(rs.getString("estado"));
             return prestamo;
         });
@@ -40,9 +45,14 @@ public class PrestamoRepository {
                 prestamo.setId(rs.getInt("id"));
                 prestamo.setUsuarioId(rs.getInt("usuario_id"));
                 prestamo.setLibroId(rs.getInt("libro_id"));
-                prestamo.setFechaPrestamo(rs.getDate("fecha_prestamo").toLocalDate());
-                prestamo.setFechaDevolucionPrevista(rs.getDate("fecha_devolucion_prevista").toLocalDate());
-                prestamo.setFechaDevolucionReal(rs.getDate("fecha_devolucion_real").toLocalDate());
+                prestamo.setFechaPrestamo(LocalDate.parse(rs.getString("fecha_prestamo")));
+                prestamo.setFechaDevolucionPrevista(LocalDate.parse(rs.getString("fecha_devolucion_prevista")));
+                String fechaRealStr = rs.getString("fecha_devolucion_real");
+                if (fechaRealStr != null) {
+                    prestamo.setFechaDevolucionReal(LocalDate.parse(fechaRealStr));
+                } else {
+                    prestamo.setFechaDevolucionReal(null); // Si es null en la BD, queda null en Java sin romper
+                }
                 prestamo.setEstado(rs.getString("estado"));
                 return prestamo;
             }, id);
