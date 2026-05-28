@@ -36,6 +36,21 @@ public class PrestamoRepository {
             return prestamo;
         });
     }
+
+    public List<Prestamo> findAllActive() {
+        String sql = "SELECT * FROM prestamos WHERE estado = 'ACTIVO'";
+        return jdbcTemplate.query(sql, (rs, rowNum) -> {
+            Prestamo prestamo = new Prestamo();
+            prestamo.setId(rs.getInt("id"));
+            prestamo.setUsuarioId(rs.getInt("usuario_id"));
+            prestamo.setLibroId(rs.getInt("libro_id"));
+            prestamo.setFechaPrestamo(LocalDate.parse(rs.getString("fecha_prestamo")));
+            prestamo.setFechaDevolucionPrevista(LocalDate.parse(rs.getString("fecha_devolucion_prevista")));
+            prestamo.setFechaDevolucionReal(null); 
+            prestamo.setEstado(rs.getString("estado"));
+            return prestamo;
+        });
+    }
     
     public Prestamo findId(int id) {
         String sql = "SELECT * FROM prestamos WHERE id = ?";

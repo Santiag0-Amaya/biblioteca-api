@@ -31,7 +31,7 @@ public class BibliotecaApplication implements CommandLineRunner {
     private UsuarioService usuarioService;
     
     @Autowired
-    private PrestamoService prestamoService; // Inyectamos el servicio de préstamos
+    private PrestamoService prestamoService;
 
     @Override
     public void run(String... args) throws Exception {
@@ -83,7 +83,7 @@ public class BibliotecaApplication implements CommandLineRunner {
                 case 7:
                     listarPrestamos();
                     break;
-                case 8:
+                case 9:
                     salir = true;
                     System.out.println("¡Hasta luego!");
                     break;
@@ -202,7 +202,29 @@ public class BibliotecaApplication implements CommandLineRunner {
     }
 
     private void listarPrestamos() {
-        List<Prestamo> prestamos = prestamoService.obtenerTodosLosPrestamos();
+        System.out.println("¿Qué préstamos desea listar?");
+        System.out.println("1 - Todos los préstamos");
+        System.out.println("2 - Solo préstamos activos");
+
+        int opcion = scanner.nextInt();
+        scanner.nextLine(); // limpiar buffer
+
+        List<Prestamo> prestamos;
+
+        switch (opcion) {
+            case 1:
+                prestamos = prestamoService.obtenerTodosLosPrestamos();
+                break;
+
+            case 2:
+                prestamos = prestamoService.obtenerPrestamosActivos();
+                break;
+
+            default:
+                System.out.println("Opción inválida.");
+                return;
+        }
+
         if (prestamos.isEmpty()) {
             System.out.println("No hay préstamos registrados.");
         } else {

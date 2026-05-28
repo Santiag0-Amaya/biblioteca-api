@@ -67,6 +67,10 @@ public class PrestamoService {
         return prestamo;
 
     }
+
+    public List<Prestamo> obtenerPrestamosActivos() {
+        return prestamoRepository.findAllActive();
+    }
     
     public List<Prestamo> obtenerTodosLosPrestamos() {
         // Aquí puedes agregar lógica antes de devolver
