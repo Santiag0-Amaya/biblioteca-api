@@ -1,6 +1,7 @@
 package com.santiago.biblioteca.service;
 
 import java.util.List;
+import java.util.Optional; // 1. Importamos Optional
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,17 +16,17 @@ public class LibroService {
     private LibroRepository libroRepository;
     
     public List<Libro> obtenerTodosLosLibros() {
-        // Aquí puedes agregar lógica antes de devolver
-        // Por ejemplo: filtrar, ordenar, validar permisos, etc.
         return libroRepository.findAll();
     }
 
-    public Libro obtenerPorId(int id) {
-        return libroRepository.findId(id);
-    }
-    public void guardar(Libro libro) {
-        libroRepository.save(libro);
+    // 2. Cambiamos el tipo de retorno de 'Libro' a 'Optional<Libro>'
+    public Optional<Libro> obtenerPorId(int id) {
+        // 3. Usamos 'findById' que es el método nativo de Spring Data JPA
+        return libroRepository.findById(id); 
     }
 
-
+    // 4. Modificamos el guardar para que devuelva el libro creado
+    public Libro guardar(Libro libro) {
+        return libroRepository.save(libro); // save() ya devuelve la entidad persistida con su ID
+    }
 }
