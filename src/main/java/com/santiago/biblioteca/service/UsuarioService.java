@@ -2,31 +2,38 @@ package com.santiago.biblioteca.service;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.santiago.biblioteca.model.Usuario;
-import com.santiago.biblioteca.repository.UsuarioRepository;
 
-@Service
-public class UsuarioService {
+public class UsuarioService implements IUsuarioService {
 
-    @Autowired
-    private UsuarioRepository usuarioRepository;
-    
-
-    public List<Usuario> obtenerTodosLosUsuarios(){
-        return usuarioRepository.findAll(); 
-    }
-    
-    public Usuario obtenerPorId(int id) {
-        return usuarioRepository.findId(id);
-    }
-    public void guardar(Usuario usuario) {
-        usuarioRepository.save(usuario);
+    @Override
+    public List<Usuario> mostrarUsuarios() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'mostrarUsuarios'");
     }
 
-    public boolean puedePedirPrestamo(Usuario usuario){
-        return usuario != null && usuario.getEstado().equals("VALIDO");
+    @Override
+    public Usuario buscarId(int idUsuario) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'buscarId'");
     }
+
+    @Override
+    public Usuario agregarUsuario(Usuario Usuario) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'agregarUsuario'");
+    }
+
+    @Override
+    public boolean removerUsuario(int idUsuario) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'removerUsuario'");
+    }
+
+    @Override
+    public Usuario editarUsuario(int idUsuario, Usuario Usuario) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'editarUsuario'");
+    }
+
 }

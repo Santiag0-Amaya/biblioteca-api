@@ -1,8 +1,16 @@
 package com.santiago.biblioteca.model;
 
-import lombok.Data;
+import jakarta.persistence.Entity;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
+@Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Usuario {
     private int id;
     private String dni;

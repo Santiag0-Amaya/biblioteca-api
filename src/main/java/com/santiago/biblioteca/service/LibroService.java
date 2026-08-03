@@ -1,32 +1,64 @@
 package com.santiago.biblioteca.service;
 
 import java.util.List;
-import java.util.Optional; // 1. Importamos Optional
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import com.santiago.biblioteca.model.Libro;
-import com.santiago.biblioteca.repository.LibroRepository;
+import com.santiago.biblioteca.repository.ILibroRepository;
 
-@Service
-public class LibroService {
+public class LibroService implements ILibroService {
+
     
-    @Autowired
-    private LibroRepository libroRepository;
-    
-    public List<Libro> obtenerTodosLosLibros() {
+    private ILibroRepository libroRepository;
+
+    public LibroService (ILibroRepository libroRepository) {
+        this.libroRepository = libroRepository;
+    }
+
+    @Override
+    public boolean existeLibro (String isbn) {
+        return libroRepository.existsByIsbn(isbn);
+    }
+
+    @Override
+    public List<Libro> mostrarLibros() {
         return libroRepository.findAll();
     }
 
-    // 2. Cambiamos el tipo de retorno de 'Libro' a 'Optional<Libro>'
-    public Optional<Libro> obtenerPorId(int id) {
-        // 3. Usamos 'findById' que es el método nativo de Spring Data JPA
-        return libroRepository.findById(id); 
+    @Override
+    public Libro buscarId(int idLibro) {
+        return libroRepository.findById(idLibro).orElse(null);
     }
 
-    // 4. Modificamos el guardar para que devuelva el libro creado
-    public Libro guardar(Libro libro) {
-        return libroRepository.save(libro); // save() ya devuelve la entidad persistida con su ID
+    @Override
+    public Libro agregarLibro(Libro libro) {
+        if(libro == null || existeLibro(libro.getIsbn())) return null;
+
+        // retorno asi, para que la id se genere en la bd y se devuelva junto al producto
+        return libroRepository.save(libro);
     }
+
+    @Override
+    public boolean removerLibro(int idLibro) {
+        Libro libroExistente = buscarId(idLibro);
+        if(libroExistente == null) return false;
+
+        libroRepository.delete(libroExistente);
+        return true;
+    }
+
+    @Override
+    public Libro editarLibro(int idLibro, Libro libro) {
+        Libro libroExistente = buscarId(idLibro);
+        if(libroExistente == null || libro == null) return null;
+
+        libroExistente.setAutor(libro.getAutor());
+        libroExistente.setIsbn(libro.getIsbn());
+        libroExistente.setAnioPublicacion(libro.getAnioPublicacion());
+        libroExistente.setStockDisponible(libro.getStockDisponible());
+        libroExistente.setStockTotal(libro.getStockTotal());
+        libroExistente.setTitulo(libro.getTitulo());
+
+        return libroRepository.save(libroExistente);
+    }
+
 }
