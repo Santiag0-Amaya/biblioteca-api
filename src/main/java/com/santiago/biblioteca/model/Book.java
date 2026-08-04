@@ -15,17 +15,18 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor 
 
-public class Libro {
+public class Book {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    private String titulo;
-    private String autor;
+    private String tittle;
+    private String author;
     private String isbn;
-    private int anioPublicacion;
-    private int stockTotal;        
-    private int stockDisponible;
+    private int publicationDate;
+    private int totalStock;        
+    private int availableStock;
+    private boolean deleted;
     
     
  

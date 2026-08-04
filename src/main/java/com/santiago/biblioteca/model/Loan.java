@@ -1,5 +1,7 @@
 package com.santiago.biblioteca.model;
 
+import java.time.LocalDate;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -14,16 +16,15 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Usuario {
+public class Loan {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    private String dni;
-    private String nombre;
-    private String apellido;
-    private String email;
-    private String telefono;
-    private String estado;  // VALIDO-INVALIDO
-    private boolean eliminado; 
+    private User user;
+    private Book book;
+    private LocalDate loanDate;
+    private LocalDate expectedReturnDate;
+    private LocalDate realReturnDate;
+    private String status;  // activo-vencido-devuelto
 
 }
