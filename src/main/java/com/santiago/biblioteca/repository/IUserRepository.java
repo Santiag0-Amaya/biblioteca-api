@@ -7,5 +7,5 @@ import com.santiago.biblioteca.model.Usuario;
 
 @Repository
 public interface IUserRepository extends JpaRepository<Usuario, Integer> {
-
+    boolean existsByDni (String dni);
 }
