@@ -2,9 +2,12 @@ package com.santiago.biblioteca.service;
 
 import java.util.List;
 
+import org.springframework.stereotype.Service;
+
 import com.santiago.biblioteca.model.User;
 import com.santiago.biblioteca.repository.IUserRepository;
 
+@Service
 public class UserService implements IUserService {
 
     private IUserRepository userRepository;
@@ -29,7 +32,7 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public User agregarUser(User user) {
+    public User addUser(User user) {
         if(user == null || existUser(user.getDni()) ) return null;
 
         return userRepository.save(user);

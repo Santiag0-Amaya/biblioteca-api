@@ -3,7 +3,6 @@ package com.santiago.biblioteca.controller;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -55,30 +54,30 @@ public class BookController {
     public ResponseEntity<?> editBook (@PathVariable int id, @RequestBody Book book) {
         Book bookEdited = bookService.editBook(id, book);
         if(bookEdited == null){
-            return ResponseEntity.badRequest().body("No se pudo editer");
+            return ResponseEntity.badRequest().body("No se pudo editar");
         }
         return ResponseEntity.ok(bookEdited);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> removedBook (@PathVariable int idBook) {
-        boolean eliminatedBook = bookService.removeBook(idBook);
+    @PutMapping("/{id}/logical-delete")
+    public ResponseEntity<String> logicallyDeletedBook (@PathVariable int id) {
+        boolean eliminatedBook = bookService.logicallyDeleteBook(id);
 
         if (!eliminatedBook) return ResponseEntity.status(HttpStatus.NOT_FOUND)
             .body("No se encuentra el Book con ese codigo");
 
         return ResponseEntity.ok("Producto eliminado correctamente"); 
+
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> logicallyDeletedBook (@PathVariable int idBook) {
-        boolean eliminatedBook = bookService.logicallyDeleteBook(idBook);
+    public ResponseEntity<String> removedBook (@PathVariable int id) {
+        boolean eliminatedBook = bookService.removeBook(id);
 
         if (!eliminatedBook) return ResponseEntity.status(HttpStatus.NOT_FOUND)
             .body("No se encuentra el Book con ese codigo");
 
         return ResponseEntity.ok("Producto eliminado correctamente"); 
-
     }
 
 }

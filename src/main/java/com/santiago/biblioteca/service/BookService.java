@@ -2,9 +2,11 @@ package com.santiago.biblioteca.service;
 
 import java.util.List;
 
+import org.springframework.stereotype.Service;
+
 import com.santiago.biblioteca.model.Book;
 import com.santiago.biblioteca.repository.IBookRepository;
-
+@Service
 public class BookService implements IBookService {
 
     
@@ -67,7 +69,7 @@ public class BookService implements IBookService {
         bookExisting.setPublicationDate(book.getPublicationDate());
         bookExisting.setAvailableStock(book.getAvailableStock());
         bookExisting.setTotalStock(book.getTotalStock());
-        bookExisting.setTittle(book.getTittle());
+        bookExisting.setTitle(book.getTitle());
 
         return bookRepository.save(bookExisting);
     }

@@ -12,7 +12,7 @@ public interface IUserService {
     boolean existUser (String dni);
     
     // CREATE
-    User agregarUser(User user);
+    User addUser(User user);
     
     // DELETE
     boolean removeUser(int idUser);

@@ -3,13 +3,15 @@ package com.santiago.biblioteca.service;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.stereotype.Service;
+
 import com.santiago.biblioteca.model.Book;
 import com.santiago.biblioteca.model.Loan;
 import com.santiago.biblioteca.model.User;
 import com.santiago.biblioteca.repository.IBookRepository;
 import com.santiago.biblioteca.repository.ILoanRepository;
 import com.santiago.biblioteca.repository.IUserRepository;
-
+@Service
 public class LoanService implements ILoanService{
 
     private ILoanRepository loanRepository;
