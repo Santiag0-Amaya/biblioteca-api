@@ -17,7 +17,7 @@ import com.santiago.biblioteca.model.Loan;
 import com.santiago.biblioteca.service.ILoanService;
 
 @RestController
-@RequestMapping("/api/Loans")
+@RequestMapping("/api/loans")
 public class LoanController {
     
     private ILoanService loanService;

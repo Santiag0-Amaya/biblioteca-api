@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.santiago.biblioteca.model.Book;
 import com.santiago.biblioteca.model.Loan;
@@ -31,17 +32,17 @@ public class LoanService implements ILoanService{
     public Loan findId(int idLoan) {
         return loanRepository.findById(idLoan).orElse(null);
     }
-
+    @Transactional 
     @Override
     public Loan addLoan(Loan loan) {
-        if(loan == null) return null;
+        if (loan == null || loan.getUser() == null || loan.getBook() == null) return null;
 
         int idUser = loan.getUser().getId();
         User user = userRepository.findById(idUser).orElse(null);
         if(user == null) return null;
 
         int idBook = loan.getBook().getId();
-        Book book = bookRepository.findById(idBook).orElse(null);
+        Book book = bookRepository.findByIdForUpdate(idBook).orElse(null);
         if(book == null) return null;
         if(book.getAvailableStock()<=0) return null;
 
@@ -78,22 +79,30 @@ public class LoanService implements ILoanService{
 
         return loanRepository.save(loanExisting);
     }
-
+    @Transactional 
     @Override
     public boolean registerReturn(int idLoan) {
 
-        Loan loan = loanRepository.findById(idLoan)
+        Loan loan = loanRepository.findByIdForUpdate(idLoan)
                 .orElse(null);
 
         if (loan == null) {
             return false;
         }
 
-        if (loan.getStatus().equals("RETURNED")) {
+        if ("DEVUELTO".equals(loan.getStatus())) {
             return false;
         }
 
-        Book book = loan.getBook();
+        if (loan.getBook() == null) {
+            return false;
+        }
+
+        Book book = bookRepository.findByIdForUpdate(loan.getBook().getId())
+                .orElse(null);
+        if (book == null) {
+            return false;
+        }
 
         book.setAvailableStock( book.getAvailableStock() + 1);
 

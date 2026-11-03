@@ -1,5 +1,6 @@
 package com.santiago.biblioteca.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -22,6 +23,7 @@ public class Book {
     private int id;
     private String title;
     private String author;
+    @Column(nullable = false, unique = true)
     private String isbn;
     private int publicationDate;
     private int totalStock;        

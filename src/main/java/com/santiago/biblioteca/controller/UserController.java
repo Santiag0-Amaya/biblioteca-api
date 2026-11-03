@@ -18,7 +18,7 @@ import com.santiago.biblioteca.model.User;
 import com.santiago.biblioteca.service.IUserService;
 
 @RestController
-@RequestMapping("/api/Users")
+@RequestMapping("/api/users")
 public class UserController {
     
     private IUserService userService;

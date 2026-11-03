@@ -2,6 +2,7 @@ package com.santiago.biblioteca.controller;
 
 import java.util.List;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,7 +18,7 @@ import com.santiago.biblioteca.model.Book;
 import com.santiago.biblioteca.service.IBookService;
 
 @RestController
-@RequestMapping("/api/Books")
+@RequestMapping("/api/books")
 public class BookController {
     private final IBookService bookService;
 
@@ -43,7 +44,23 @@ public class BookController {
 
     @PostMapping
     public ResponseEntity<?> addBook (@RequestBody Book book) {
-        Book bookCreated = bookService.addBook(book);
+        if (book == null || book.getIsbn() == null || book.getIsbn().isBlank()) {
+            return ResponseEntity.badRequest().body("El ISBN del libro es obligatorio");
+        }
+
+        if (bookService.existBook(book.getIsbn())) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body("Ya existe un libro con ese ISBN");
+        }
+
+        Book bookCreated;
+        try {
+            bookCreated = bookService.addBook(book);
+        } catch (DataIntegrityViolationException exception) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body("Ya existe un libro con ese ISBN");
+        }
+
         if(bookCreated == null){
             return ResponseEntity.badRequest().body("Los datos de Book no son validos");
         }
