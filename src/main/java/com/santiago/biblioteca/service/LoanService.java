@@ -23,6 +23,7 @@ public class LoanService implements ILoanService{
         this.bookRepository = bookRepository;
         this.userRepository = userRepository;
     }
+
     @Override
     public List<Loan> showLoans() {
         return loanRepository.findAll();
@@ -32,6 +33,7 @@ public class LoanService implements ILoanService{
     public Loan findId(int idLoan) {
         return loanRepository.findById(idLoan).orElse(null);
     }
+
     @Transactional 
     @Override
     public Loan addLoan(Loan loan) {
@@ -39,31 +41,52 @@ public class LoanService implements ILoanService{
 
         int idUser = loan.getUser().getId();
         User user = userRepository.findById(idUser).orElse(null);
-        if(user == null || user.isDeleted() || !user.getStatus().equals("VALIDO")) return null;
+        if(user == null || user.isDeleted() || !"VALIDO".equals(user.getStatus())) return null;
 
         int idBook = loan.getBook().getId();
         Book book = bookRepository.findByIdForUpdate(idBook).orElse(null);
         if(book == null) return null;
-        if(book.getAvailableStock()<=0) return null;
+        if(book.getAvailableStock()<=0 || book.isDeleted()) return null;
 
         // pongo los Books y Users reales traidos de la bd. tenia solo sus id
         loan.setBook(book);
         loan.setUser(user);
-
+        loan.setLoanDate(LocalDate.now());
+        loan.setStatus("ACTIVO");
         book.setAvailableStock(book.getAvailableStock()-1);
 
         // actualizo el stock
         bookRepository.save(book);
 
         return loanRepository.save(loan);
-
     }
-
+    
+    @Transactional
     @Override
     public boolean removeLoan(int idLoan) {
-        Loan loan = loanRepository.findById(idLoan).orElse(null);
-        if(loan == null) return false;
-        loanRepository.delete(loan);
+        Loan loan = loanRepository.findByIdForUpdate(idLoan).orElse(null);
+        if (loan == null) {
+            return false;
+        }
+
+        if (!"DEVUELTO".equals(loan.getStatus())) {
+            if (loan.getBook() == null) { //si tiene un libro valido asociado
+                return false;
+            }
+
+            Book book = bookRepository
+                    .findByIdForUpdate(loan.getBook().getId())  
+                    .orElse(null);
+
+            if (book == null) { // si el libro buscado en la base de datos existe
+                return false;
+            }
+
+            book.setAvailableStock(book.getAvailableStock() + 1); // repongo el libro al stock
+            bookRepository.save(book); // actualizo el stock
+        }
+
+        loanRepository.delete(loan); // elimino el prestamo
         return true;
     }
 
@@ -79,6 +102,7 @@ public class LoanService implements ILoanService{
 
         return loanRepository.save(loanExisting);
     }
+
     @Transactional 
     @Override
     public boolean registerReturn(int idLoan) {
@@ -115,7 +139,4 @@ public class LoanService implements ILoanService{
 
         return true;
     }
-
-
-
 }

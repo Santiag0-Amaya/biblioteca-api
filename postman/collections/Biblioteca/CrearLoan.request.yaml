@@ -1,0 +1,28 @@
+$kind: http-request
+description: ""
+url: http://localhost:8080/api/loans
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \    \"user\" : {\r
+
+    \        \"id\" : 1\r
+
+    \    },\r
+
+    \    \"book\" : {\r
+
+    \        \"id\" : 4\r
+
+    \    },\r
+
+    \    \"loanDate\" : \"2026-11-04\",\r
+
+    \    \"expectedReturnDate\" : \"2026-11-18\",\r
+
+    \    \"status\" : \"ACTIVO\"\r
+
+    }"
+order: 1793735094341

@@ -20,5 +20,6 @@ public interface IUserService {
     
     //UPDATE
     User editUser (int idUser, User user);
+    boolean changeUserStatus(int idUser, String status);
 
 }

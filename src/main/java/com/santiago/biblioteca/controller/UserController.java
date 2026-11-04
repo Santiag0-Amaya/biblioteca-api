@@ -68,6 +68,16 @@ public class UserController {
         return ResponseEntity.ok(userRemoved);
     }
 
+    @PutMapping ("/{id}/status")
+    public ResponseEntity <?> changeUserStatus (@PathVariable int id, @RequestBody User user) {
+        Boolean statusChanged = userService.changeUserStatus(id, user.getStatus());
+        if(!statusChanged) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+            .body("No se encuentra el user para cambiar su estado");
+        }
+        return ResponseEntity.ok(statusChanged);
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity <?> removedUser (@PathVariable int id) {
         Boolean userRemoved = userService.removeUser(id);

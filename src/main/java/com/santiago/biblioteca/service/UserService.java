@@ -38,7 +38,6 @@ public class UserService implements IUserService {
         user.setStatus("VALIDO");
 
         return userRepository.save(user);
-
     }
 
     @Override
@@ -71,6 +70,15 @@ public class UserService implements IUserService {
         userExistente.setPhone(user.getPhone());
 
         return userRepository.save(userExistente);
+    }
+    
+    @Override 
+    public boolean changeUserStatus(int idUser, String status) {
+        User userExistente = findId(idUser);
+        if (userExistente == null) return false;
+        userExistente.setStatus(status);
+        userRepository.save(userExistente);
+        return true;
     }
 
 }
