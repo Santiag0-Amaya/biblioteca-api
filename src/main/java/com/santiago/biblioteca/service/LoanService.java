@@ -39,7 +39,7 @@ public class LoanService implements ILoanService{
 
         int idUser = loan.getUser().getId();
         User user = userRepository.findById(idUser).orElse(null);
-        if(user == null) return null;
+        if(user == null || user.isDeleted() || !user.getStatus().equals("VALIDO")) return null;
 
         int idBook = loan.getBook().getId();
         Book book = bookRepository.findByIdForUpdate(idBook).orElse(null);

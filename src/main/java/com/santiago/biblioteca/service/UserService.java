@@ -34,6 +34,8 @@ public class UserService implements IUserService {
     @Override
     public User addUser(User user) {
         if(user == null || existUser(user.getDni()) ) return null;
+        user.setDeleted(false);
+        user.setStatus("VALIDO");
 
         return userRepository.save(user);
 

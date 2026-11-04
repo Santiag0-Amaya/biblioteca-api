@@ -1,0 +1,26 @@
+$kind: http-request
+description: ""
+url: http://localhost:8080/api/users
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \    \"dni\" : \"45593650\",\r
+
+    \    \"name\" : \"Santiago\",\r
+
+    \    \"lastname\" : \"Amaya\",\r
+
+    \    \"email\" : \"santiagoamaya321@gmail.com\",\r
+
+    \    \"phone\" : \"35851129873\",\r
+
+    \    \"deleted\" : \"false\"\r
+
+    \r
+
+    \r
+
+    }"
+order: 1793735092341

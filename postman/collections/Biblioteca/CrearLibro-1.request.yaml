@@ -1,0 +1,25 @@
+$kind: http-request
+name: CrearLibro
+description: ""
+url: http://localhost:8080/api/books
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \  \"title\": \"Cancion de Hielo y Fuego: Juego de Tronos\",\r
+
+    \  \"author\": \"George Raymond Richard Martin\",\r
+
+    \   \"isbn\": \"8989312374\",\r
+
+    \  \"publicationDate\": 1996,\r
+
+    \  \"totalStock\": 10,\r
+
+    \  \"availableStock\": 10,\r
+
+    \  \"deleted\": false\r
+
+    }"
+order: 1793735090341
