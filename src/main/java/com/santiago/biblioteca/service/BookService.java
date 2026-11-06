@@ -54,8 +54,7 @@ public class BookService implements IBookService {
         if(bookExisting == null) return false;
 
         bookExisting.setDeleted(true);
-
-
+        bookRepository.save(bookExisting);
         return true;
     }
 
