@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 import com.santiago.biblioteca.model.User;
 import com.santiago.biblioteca.repository.IUserRepository;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class UserService implements IUserService {
 
@@ -30,7 +32,7 @@ public class UserService implements IUserService {
     public User findId(int idUser) {
         return userRepository.findById(idUser).orElse(null);
     }
-
+    @Transactional 
     @Override
     public User addUser(User user) {
         if(user == null || existUser(user.getDni()) ) return null;
@@ -39,7 +41,7 @@ public class UserService implements IUserService {
 
         return userRepository.save(user);
     }
-
+    @Transactional 
     @Override
     public boolean removeUser(int idUser) {
         User userExistente = findId(idUser);

@@ -2,6 +2,7 @@ package com.santiago.biblioteca.controller;
 
 import java.util.List;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.santiago.biblioteca.dto.UserRequestDto;
 import com.santiago.biblioteca.model.User;
 import com.santiago.biblioteca.service.IUserService;
 
@@ -26,10 +28,30 @@ public class UserController {
         this.userService = userService;
     }
 
+    private UserRequestDto toDto(User user) {
+        return new UserRequestDto(
+                user.getId(),
+                user.getDni(),
+                user.getName(),
+                user.getLastname(),
+                user.getEmail(),
+                user.getPhone()
+        );
+    }
+
+    private User toEntity(UserRequestDto dto) {
+        User user = new User();
+        user.setDni(dto.getDni());
+        user.setName(dto.getName());
+        user.setLastname(dto.getLastname());
+        user.setEmail(dto.getEmail());
+        user.setPhone(dto.getPhone());
+        return user;
+    }
+
     @GetMapping()
-    public List<User> showUsers () {
-        
-        return userService.showUsers();
+    public List<UserRequestDto> showUsers () {
+        return userService.showUsers().stream().map(this::toDto).collect(java.util.stream.Collectors.toList());
     }
 
     @GetMapping("/{id}")
@@ -38,24 +60,52 @@ public class UserController {
         if(user == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No se encuentra usuario con ese id");
         }
-        return ResponseEntity.ok(user);
+        return ResponseEntity.ok(toDto(user));
     }
     @PostMapping()
-    public ResponseEntity<?> addUser(@RequestBody User user) {
-        User userCreated = userService.addUser(user);
-        if(userCreated == null) {
-            return ResponseEntity.badRequest().body("Los datos del user no son validos");
+    public ResponseEntity<?> addUser(@RequestBody UserRequestDto userRequestDto) {
+        if (userRequestDto == null || userRequestDto.getDni() == null || userRequestDto.getDni().isBlank()) {
+            return ResponseEntity.badRequest().body("El Dni del usuario es obligatorio");
+        }
+
+        if (userService.existUser(userRequestDto.getDni())) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body("Ya existe un usuario con ese Dni");
+        }
+        User userCreated;
+        try {
+            userCreated =  userService.addUser(toEntity(userRequestDto));
+        } catch (DataIntegrityViolationException exception) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body("Ya existe un usuario con ese Dni");
+        }
+        if (userCreated == null) {
+            return ResponseEntity.badRequest().body("Los datos del usuario no son validos");
         }
         return ResponseEntity.status(HttpStatus.CREATED).body(userCreated);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> editUser (@PathVariable int id, @RequestBody User user) {
-        User editedUser = userService.editUser(id, user);
-        if(editedUser == null) {
-            return ResponseEntity.badRequest().body("Los datos nuevos del user no son validos");
+    public ResponseEntity<?> editUser (@PathVariable int id, @RequestBody UserRequestDto userRequestDto) {
+        if (userRequestDto == null || userRequestDto.getDni() == null || userRequestDto.getDni().isBlank()) {
+            return ResponseEntity.badRequest().body("El Dni del usuario es obligatorio");
         }
-        return ResponseEntity.ok(editedUser);
+        if (userService.existUser(userRequestDto.getDni())) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body("Ya existe un usuario con ese Dni");
+        }
+        User userEdited;
+        try {
+            userEdited = userService.editUser(id, toEntity(userRequestDto)); 
+        } catch (DataIntegrityViolationException exception) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body("Ya existe un usuario con ese dni");
+        }
+        if (userEdited == null) {
+            return ResponseEntity.badRequest().body("No se pudo editar");
+        }
+
+        return ResponseEntity.ok(toDto(userEdited));
     }
 
     @PutMapping("/{id}/logically-delete")

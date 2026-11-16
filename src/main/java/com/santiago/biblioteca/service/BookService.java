@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 
 import com.santiago.biblioteca.model.Book;
 import com.santiago.biblioteca.repository.IBookRepository;
+
+import jakarta.transaction.Transactional;
 @Service
 public class BookService implements IBookService {
 
@@ -30,7 +32,7 @@ public class BookService implements IBookService {
     public Book findId(int idBook) {
         return bookRepository.findById(idBook).orElse(null);
     }
-
+    @Transactional 
     @Override
     public Book addBook(Book book) {
         if(book == null || existBook(book.getIsbn())) return null;
@@ -38,7 +40,7 @@ public class BookService implements IBookService {
         // retorno asi, para que la id se genere en la bd y se devuelva junto al producto
         return bookRepository.save(book);
     }
-
+    @Transactional 
     @Override
     public boolean removeBook(int idBook) {
         Book bookExisting = findId(idBook);
@@ -47,7 +49,7 @@ public class BookService implements IBookService {
         bookRepository.delete(bookExisting);
         return true;
     }
-
+    @Transactional 
     @Override
     public boolean logicallyDeleteBook (int idBook) {
         Book bookExisting = findId(idBook);
@@ -57,7 +59,7 @@ public class BookService implements IBookService {
         bookRepository.save(bookExisting);
         return true;
     }
-
+    @Transactional 
     @Override
     public Book editBook(int idBook, Book book) {
         Book bookExisting = findId(idBook);

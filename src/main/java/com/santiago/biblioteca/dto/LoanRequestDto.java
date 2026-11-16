@@ -11,7 +11,7 @@ import lombok.Setter;
 @Setter 
 @NoArgsConstructor 
 @AllArgsConstructor 
-public class LoanDto {
+public class LoanRequestDto {
     private int id;
     private String bookTitle;
     private String userDni;

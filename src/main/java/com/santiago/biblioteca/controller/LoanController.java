@@ -13,7 +13,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.santiago.biblioteca.dto.LoanCreateRequestDto;
+import com.santiago.biblioteca.dto.LoanRequestDto;
+import com.santiago.biblioteca.dto.LoanUpdateRequestDto;
+import com.santiago.biblioteca.model.Book;
 import com.santiago.biblioteca.model.Loan;
+import com.santiago.biblioteca.model.User;
 import com.santiago.biblioteca.service.ILoanService;
 
 @RestController
@@ -25,11 +30,42 @@ public class LoanController {
     public LoanController (ILoanService loanService) {
         this.loanService = loanService;
     }
+
+    private LoanRequestDto toDto (Loan loan){
+        return new LoanRequestDto(
+            loan.getId(),
+            loan.getBook().getTitle(),
+            loan.getUser().getDni(),
+            loan.getLoanDate(),
+            loan.getExpectedReturnDate(),
+            loan.getRealReturnDate(),
+            loan.getStatus()
+        );
+    }
+
+    private Loan toEntity(LoanCreateRequestDto loanRequestDto) {
+        User user = new User();
+        user.setId(loanRequestDto.getUserId());
+
+        Book book = new Book();
+        book.setId(loanRequestDto.getBookId());
+
+        Loan loan = new Loan();
+        loan.setUser(user);
+        loan.setBook(book);
+        loan.setExpectedReturnDate(loanRequestDto.getExpectedReturnDate());
+        return loan;
+    }
+
+    private Loan toEntity(LoanUpdateRequestDto loanRequestDto) {
+        Loan loan = new Loan();
+        loan.setExpectedReturnDate(loanRequestDto.getExpectedReturnDate());
+        return loan;
+    }
     
     @GetMapping()
-    public List<Loan> showUsers () {
-        
-        return loanService.showLoans();
+    public List<LoanRequestDto> showLoans () {
+        return loanService.showLoans().stream().map(this::toDto).toList();
     }
 
     @GetMapping("/{id}")
@@ -39,26 +75,38 @@ public class LoanController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
             .body("No se encuentra un prestamo con esa id");
         }
-        return ResponseEntity.ok(loan);
+        return ResponseEntity.ok(toDto(loan));
     }
 
     @PostMapping()
-    public ResponseEntity <?> addLoan(@RequestBody Loan loan) {
-        Loan addedLoan = loanService.addLoan(loan);
+    public ResponseEntity<?> addLoan(@RequestBody LoanCreateRequestDto loanRequestDto) {
+        if (loanRequestDto == null
+                || loanRequestDto.getUserId() == null
+                || loanRequestDto.getUserId() <= 0
+                || loanRequestDto.getBookId() == null
+                || loanRequestDto.getBookId() <= 0) {
+            return ResponseEntity.badRequest().body("Los datos del prestamo no son validos");
+        }
+        
+        Loan addedLoan = loanService.addLoan(toEntity(loanRequestDto));
         if(addedLoan == null) {
             return ResponseEntity.badRequest().body("Los datos del prestamo no son validos");
         }
-        return ResponseEntity.status(HttpStatus.CREATED).body(addedLoan);
+        return ResponseEntity.status(HttpStatus.CREATED).body(toDto(addedLoan));
     }
     
     @PutMapping ("/{id}")
-    public ResponseEntity<?> editLoan (@PathVariable int id, @RequestBody Loan loan) {
-        Loan editedLoan = loanService.editLoan(loan, id);
+    public ResponseEntity<?> editLoan(@PathVariable int id, @RequestBody LoanUpdateRequestDto loanRequestDto) {
+        if (loanRequestDto == null || loanRequestDto.getExpectedReturnDate() == null) {
+            return ResponseEntity.badRequest().body("Los datos del prestamo no son validos");
+        }
+        Loan editedLoan = loanService.editLoan(toEntity(loanRequestDto), id);
         if(editedLoan == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Los datos nuevos no son validos");
         }
-        return ResponseEntity.ok(editedLoan);
+        return ResponseEntity.ok(toDto(editedLoan));
     }
+
     @PutMapping ("/{id}/register-return")
     public ResponseEntity<?> registerReturn (@PathVariable int id) {
         boolean returnedLoan = loanService.registerReturn(id);

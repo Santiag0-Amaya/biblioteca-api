@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.santiago.biblioteca.dto.BookRequestDto;
 import com.santiago.biblioteca.model.Book;
 import com.santiago.biblioteca.service.IBookService;
 
@@ -26,10 +27,36 @@ public class BookController {
         this.bookService = bookService;
     }    
 
+    private BookRequestDto toDto(Book book) {
+        return new BookRequestDto(
+                book.getId(),
+                book.getTitle(),
+                book.getAuthor(),
+                book.getIsbn(),
+                book.getPublicationDate(),
+                book.getTotalStock(),
+                book.getAvailableStock()
+        );
+    }
+
+    private Book toEntity(BookRequestDto dto) {
+        Book book = new Book();
+        book.setTitle(dto.getTitle());
+        book.setAuthor(dto.getAuthor());
+        book.setIsbn(dto.getIsbn());
+        book.setPublicationDate(dto.getPublicationDate());
+        book.setTotalStock(dto.getTotalStock());
+        book.setAvailableStock(dto.getAvailableStock());
+        return book;
+    }
+
     //READ
     @GetMapping
-    public List<Book> showBooks() {
-        return bookService.showBooks();
+    public List<BookRequestDto> showBooks() {
+        return bookService.showBooks()
+        .stream()
+        .map(this::toDto)
+        .toList();
     }
     //READ PRODUCTO ESPECIFICO
     @GetMapping("/{id}")
@@ -39,41 +66,51 @@ public class BookController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
             .body("No se encuentra el Book con ese codigo");
         }
-        return ResponseEntity.ok(book); 
+        return ResponseEntity.ok(toDto(book)); 
     } 
-
+    
     @PostMapping
-    public ResponseEntity<?> addBook (@RequestBody Book book) {
-        if (book == null || book.getIsbn() == null || book.getIsbn().isBlank()) {
+    public ResponseEntity<?> addBook (@RequestBody BookRequestDto bookDto) {
+        if (bookDto == null || bookDto.getIsbn() == null || bookDto.getIsbn().isBlank()) {
             return ResponseEntity.badRequest().body("El ISBN del libro es obligatorio");
         }
 
-        if (bookService.existBook(book.getIsbn())) {
+        if (bookService.existBook(bookDto.getIsbn())) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body("Ya existe un libro con ese ISBN");
         }
 
         Book bookCreated;
         try {
-            bookCreated = bookService.addBook(book);
+            bookCreated = bookService.addBook(toEntity(bookDto));
         } catch (DataIntegrityViolationException exception) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body("Ya existe un libro con ese ISBN");
         }
 
         if(bookCreated == null){
-            return ResponseEntity.badRequest().body("Los datos de Book no son validos");
+            return ResponseEntity.badRequest().body("Los datos del libro no son validos");
         }
-        return ResponseEntity.status(HttpStatus.CREATED).body(bookCreated); 
+        return ResponseEntity.status(HttpStatus.CREATED).body(toDto(bookCreated)); 
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> editBook (@PathVariable int id, @RequestBody Book book) {
-        Book bookEdited = bookService.editBook(id, book);
+    public ResponseEntity<?> editBook (@PathVariable int id, @RequestBody BookRequestDto bookDto) {
+        if (bookDto == null || bookDto.getIsbn() == null || bookDto.getIsbn().isBlank()) {
+            return ResponseEntity.badRequest().body("El ISBN del libro es obligatorio");
+        }
+
+        Book bookEdited;
+        try {
+            bookEdited = bookService.editBook(id, toEntity(bookDto));
+        } catch (DataIntegrityViolationException exception) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body("Ya existe un libro con ese ISBN");
+        }
         if(bookEdited == null){
             return ResponseEntity.badRequest().body("No se pudo editar");
         }
-        return ResponseEntity.ok(bookEdited);
+        return ResponseEntity.ok(toDto(bookEdited));
     }
 
     @PutMapping("/{id}/logical-delete")
